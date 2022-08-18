@@ -1,0 +1,27 @@
+import requests
+import time
+import pandas as pd
+pd.set_option('expand_frame_repr',False)
+
+base_URL = 'https://fapi.binance.com/fapi/v1/'
+
+endpoint = input("endpoint: ")
+symbol = input("Symbol: ")
+interval = input("interval: ") 
+startTime = input("startTime: ")
+endTime = input("endTime: ")
+
+'''
+https://api.binance.com/api/v3/klines?symbol=BNBUSDT&interval=1h&limit=1000
+'''
+kline_url = base_URL + endpoint + '?'+'symbol='+symbol+'&'+'interval='+interval+'&'+'startTime='+startTime+'&'+'endTime='+endTime+'&'+'=1h&limit=1000'
+print(kline_url)
+resp = requests.get(kline_url)
+data = resp.json()
+df = pd.DataFrame(data,columns={'open_time':0,'open':1,'high':2,'low':3,'close':4,'volume':5,'close_time':6,
+                                    'quote_volume':7,'trades':8,'taker_base_volume':9,
+                                    'taker_quote_volume':10,'Ignor':11})
+
+df['open_time'] = pd.to_datetime(df['open_time'],unit='ms')
+df.set_index('open_time',inplace=True)
+df.to_csv(symbol+interval+'.csv') 
